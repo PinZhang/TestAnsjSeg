@@ -4,6 +4,7 @@
     </description>
 
     <property name="main.dir" location="src"/>
+    <property name="build.dir" location="build"/>
     <property name="build.main.dir" location="build/main"/>
     <property name="dist.dir"  location="dist"/>
 
@@ -24,6 +25,9 @@
                 </fileset>
             </classpath>
         </javac>
+        <copy todir="${build.main.dir}">
+          <fileset dir="${main.dir}" includes="stopwords" />
+        </copy>
     </target>
 
     <target name="dist" depends="compile"
@@ -31,6 +35,13 @@
         <mkdir dir="${dist.dir}"/>
 
         <jar jarfile="${dist.dir}/ChineseTokenizer.jar" basedir="${build.main.dir}" />
+    </target>
+
+    <target name="clean"
+            description="clean up" >
+        <!-- Delete the ${build} and ${dist} directory trees -->
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
     </target>
 </project>
 

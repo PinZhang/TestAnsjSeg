@@ -1,9 +1,15 @@
 package org.mozilla.up;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.ToAnalysis;
+import org.ansj.util.FilterModifWord;
 
 import weka.core.RevisionUtils;
 import weka.core.tokenizers.Tokenizer;
@@ -24,7 +30,25 @@ public class ChineseTokenizer extends Tokenizer {
 	private static final long serialVersionUID = -273497067344939898L;
 
 	/** the current position */
-	protected Iterator<Term> iterator;
+	private Iterator<Term> iterator;
+	
+	private HashMap<String, String> stopWords = null; 
+	
+	public ChineseTokenizer() throws IOException {
+		this.stopWords = new HashMap<String, String>();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/stopwords")));
+		String line = null;
+
+		while (true) {
+			line = reader.readLine();
+			if (null == line) {
+				break;
+			}
+			this.stopWords.put(line, FilterModifWord._stop);
+		}
+		
+		FilterModifWord.setUpdateDic(this.stopWords);
+	}
 
 	/**
 	 * Returns a string describing the stemmer
@@ -80,7 +104,10 @@ public class ChineseTokenizer extends Tokenizer {
 			return;
 		}
 		
-		this.iterator = ToAnalysis.parse(s).iterator();
+		List<Term> items = ToAnalysis.parse(s);
+		items = FilterModifWord.modifResult(items);
+		
+		this.iterator = items.iterator();
 	}
 
 	/**

@@ -2,13 +2,15 @@ package org.mozilla.up;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
 import org.junit.Test;
 
 public class ChineseTokenizerTestCase {
 
 	private ChineseTokenizer tokenizer = null;
 	
-	public ChineseTokenizerTestCase() {
+	public ChineseTokenizerTestCase() throws IOException {
 		this.tokenizer = new ChineseTokenizer();
 	}
 	
@@ -54,5 +56,24 @@ public class ChineseTokenizerTestCase {
 		}
 		
 		assertTrue(count > 5 && gotAndroid);
+	}
+	
+	@Test
+	public void testStopWords() {
+		this.tokenizer.tokenize("我的大学");
+
+		int count = 0;
+		boolean hasStopWord = false;
+		while (this.tokenizer.hasMoreElements()) {
+			String elem = this.tokenizer.nextElement().toString();
+			System.out.println(elem);
+			if (!hasStopWord && "的".equals(elem)) {
+				hasStopWord = true;
+			}
+			count++;
+		}
+
+		// Only "大学" is left
+		assertTrue(count == 1 && !hasStopWord);
 	}
 }
